@@ -167,7 +167,7 @@ def initMessageClass(cls):
     """Decorator for the python class representing a UBX message class.
 
     It does the following in cls:
-    - add a dict with name _lookup that maps UBX message ID to python subclass.
+    - add a __dict__ with name _lookup that maps UBX message ID to python subclass.
     In each subclass it does this:
     - add an __init__ if it doesn't exist
     - add a __str__ if it doesn't exist

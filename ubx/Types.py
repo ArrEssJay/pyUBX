@@ -64,12 +64,6 @@ class I1:
     ctype = "int8_t"
 
 @_InitGenericType
-class X1:
-    """UBX 1-byte bitfield."""
-    fmt = "B"
-    ctype = "uint8_t"
-
-@_InitGenericType
 class U2:
     """UBX Unsigned Short."""
     fmt = "H"
@@ -110,12 +104,74 @@ class R4:
     """UBX single precision float."""
     fmt = "f"
     ctype = "float"
+    @staticmethod
+    def toString(val):
+        return '"{}"'.format(val)
 
 @_InitGenericType
 class R8:
     """UBX double precision float."""
     fmt = "d"
     ctype = "double"
+    @staticmethod
+    def toString(val):
+        return '"{}"'.format(val)
+
+class E1:
+    """UBX Unsigned Char. - Enumerated"""
+    _size = Struct("B").size
+    ctype = "uint8_t"
+    fmt = "B"
+
+    def __init__(self, _ord, intEnumType, allowed=[]):
+        self.ord = _ord
+        self.intEnumType = intEnumType
+    def parse(self, msg):
+        if len(msg) < self._size:
+            err = "Message length {} is shorter than required {}"\
+                  .format(len(msg), self._size)
+            raise Exception(err)
+        val = unpack(self.fmt, msg[0:self._size])[0]
+        enumVal = self.intEnumType(val)
+        return enumVal, msg[self._size:]
+    @staticmethod
+    def toString(val):
+        return '"{}"'.format(val)
+    def serialize(self, val):
+        if len(val) != self.N:
+            err = "Value length {} not equal to the required {}"\
+                  .format(len(val), self._size)
+            raise Exception(err)
+
+class X1:
+    """UBX 1-byte bitfield."""
+    _size = Struct("B").size
+    ctype = "uint8_t"
+    fmt = "B"
+
+    def __init__(self, _ord, masks=None, allowed=[]):
+        self.ord = _ord
+        self.masks = masks
+    def parse(self, msg):
+        if len(msg) < self._size:
+            err = "Message length {} is shorter than required {}"\
+                  .format(len(msg), self._size)
+            raise Exception(err)
+        val = unpack(self.fmt, msg[0:self._size])[0]
+        if self.masks == None:
+            # If no masks set, handle as U1
+            return val, msg[self._size:]
+        else:
+            masked = {name: val & mask for (name,mask) in self.masks.items()}
+            return masked, msg[self._size:]
+    @staticmethod
+    def toString(val):
+        return '"{}"'.format(val)
+    def serialize(self, val):
+        if len(val) != self.N:
+            err = "Value length {} not equal to the required {}"\
+                  .format(len(val), self._size)
+            raise Exception(err)
 
 class CH:
     """ASCII / ISO 8859.1 Encoding."""

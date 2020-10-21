@@ -5,3 +5,4 @@ from .NAV import NAV
 from .TEST import TEST
 from .TIM import TIM
 from .ESF import ESF
+from .RXM import RXM

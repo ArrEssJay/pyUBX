@@ -3,7 +3,7 @@
 from ubx.UBXMessage import UBXMessage, initMessageClass, addGet
 import struct
 from ubx.Types import U1, U2, U4, X2, X4, U, I2, I4
-
+from ubx.Tables import GNSS_Identifiers
 
 @initMessageClass
 class CFG:
@@ -44,17 +44,7 @@ class CFG:
             numTrkChUse = U1(3)
             numConfigBlocks = U1(4)
             class Repeated:
-                gnssId = U1(
-                    1,
-                    allowed={
-                        0: 'GPS',
-                        1: 'SBAS',
-                        2: 'Galileo',
-                        3: 'BeiDou',
-                        4: 'IMES',
-                        5: 'QZSS',
-                        6: 'GLONASS',
-                    })
+                gnssId = E1(1, intEnumType=GNSS_Identifiers)
                 resTrkCh = U1(2)
                 maxTrkCh = U1(3)
                 reserved = U1(4)
